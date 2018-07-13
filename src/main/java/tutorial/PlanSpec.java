@@ -72,17 +72,17 @@ public class PlanSpec {
 
     Project project() {
         return new Project()
-                .name("My Project")
-                .key("PROJ");
+                .name("Vega Project Build Pipeline")
+                .key("VPBP");
     }
 
     public Plan plan() {
-        final Plan plan = new Plan(project(), "the second plan", "PLAN2");
-        plan.description("Plan to experiment with bamboo");
+        final Plan plan = new Plan(project(), "build plan", "PLAN");
+        plan.description("A plan that build and test the vega project");
         plan.pluginConfigurations(new ConcurrentBuilds()
                 .useSystemWideDefault(false));
-        plan.stages(new Stage("Default Stage")
-                .jobs(new Job("Default Job",
+        plan.stages(new Stage("build and test")
+                .jobs(new Job("Build and test",
                         new BambooKey("JOB1"))
                         .tasks(new VcsCheckoutTask()
                                         .description("Checkout Default Repository")
@@ -99,13 +99,7 @@ public class PlanSpec {
                                         .description("pack")
                                         .inlineBody("dotnet pack ${bamboo.build.working.directory}/vega.csproj --no-build"))));
         plan.linkedRepositories("net core / angular tuto");
-        plan.triggers(new RepositoryPollingTrigger(),
-                new AnyTrigger(new AtlassianModule("com.atlassian.bamboo.triggers.atlassian-bamboo-triggers:daily"))
-                        .name("Single daily build")
-                        .configuration(new MapBuilder()
-                                .put("trigger.created.by.user", "vincenthetet")
-                                .put("repository.change.daily.buildTime", "10:14")
-                                .build()));
+        plan.triggers(new RepositoryPollingTrigger());
         plan.planBranchManagement(new PlanBranchManagement()
                 .delete(new BranchCleanup())
                 .notificationForCommitters());
